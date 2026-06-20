@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taller Presencial: Cómo Crear Contenido Viral</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,600;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #080810;
+    --bg-soft: #111120;
+    --accent: #FF2D78;
+    --accent-soft: #FF6FA5;
+    --accent-glow: rgba(255,45,120,0.6);
+    --text: #F4F2EF;
+    --text-dim: #7A7890;
+    --line: #1E1E2E;
+    --gold: #FFD166;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'DM Sans', -apple-system, sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+
+  /* CANVAS PARTICLES */
+  #particles{
+    position:fixed; top:0; left:0;
+    width:100%; height:100%;
+    pointer-events:none;
+    z-index:0;
+    opacity:0.55;
+  }
+
+  .wrap{max-width:560px; margin:0 auto; padding:0 24px; position:relative; z-index:1;}
+  .wrap-wide{max-width:680px; margin:0 auto; padding:0 24px; position:relative; z-index:1;}
+
+  /* ── HERO ── */
+  .hero{
+    padding:64px 0 48px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+
+  /* bokeh lights */
+  .bokeh{
+    position:absolute; border-radius:50%;
+    pointer-events:none; filter:blur(60px);
+    animation:bokehFloat linear infinite;
+  }
+  .bokeh-1{width:300px;height:300px;background:rgba(255,45,120,0.12);top:-80px;left:-80px;animation-duration:18s;}
+  .bokeh-2{width:200px;height:200px;background:rgba(140,80,255,0.1);top:40px;right:-60px;animation-duration:22s;animation-delay:-6s;}
+  .bokeh-3{width:160px;height:160px;background:rgba(255,209,102,0.07);bottom:0;left:30%;animation-duration:26s;animation-delay:-11s;}
+
+  @keyframes bokehFloat{
+    0%{transform:translate(0,0) scale(1);}
+    33%{transform:translate(20px,-30px) scale(1.05);}
+    66%{transform:translate(-15px,20px) scale(0.95);}
+    100%{transform:translate(0,0) scale(1);}
+  }
+
+  .photo{
+    width:110px; height:110px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid var(--accent);
+    margin-bottom:20px;
+    box-shadow:0 0 0 6px rgba(255,45,120,0.15), 0 0 40px rgba(255,45,120,0.25);
+    animation:photoGlow 3s ease-in-out infinite;
+  }
+  @keyframes photoGlow{
+    0%,100%{box-shadow:0 0 0 6px rgba(255,45,120,0.15), 0 0 40px rgba(255,45,120,0.2);}
+    50%{box-shadow:0 0 0 8px rgba(255,45,120,0.25), 0 0 60px rgba(255,45,120,0.4);}
+  }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--accent-soft);
+    background:rgba(255,45,120,0.08);
+    border:1px solid rgba(255,45,120,0.25);
+    padding:7px 16px; border-radius:999px;
+    margin-bottom:22px;
+    backdrop-filter:blur(8px);
+  }
+  .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 6px var(--accent);
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--accent);}50%{opacity:0.3;box-shadow:0 0 2px var(--accent);}}
+
+  /* BIG TITLE */
+  h1{
+    font-family:'Bebas Neue', 'Arial Black', sans-serif;
+    font-size:clamp(52px, 14vw, 88px);
+    line-height:0.95;
+    letter-spacing:0.01em;
+    margin-bottom:12px;
+    text-transform:uppercase;
+  }
+  .title-line1{
+    display:block;
+    color:var(--text);
+    text-shadow:0 0 40px rgba(244,242,239,0.08);
+  }
+  .title-line2{
+    display:block;
+    font-size:clamp(36px,10vw,60px);
+    color:var(--text-dim);
+    letter-spacing:0.04em;
+  }
+  .title-viral{
+    display:inline-block;
+    color:var(--accent);
+    text-shadow:
+      0 0 20px rgba(255,45,120,0.8),
+      0 0 60px rgba(255,45,120,0.4),
+      0 0 100px rgba(255,45,120,0.2);
+    animation:viralGlow 2.4s ease-in-out infinite;
+    position:relative;
+  }
+  @keyframes viralGlow{
+    0%,100%{
+      text-shadow:0 0 20px rgba(255,45,120,0.8), 0 0 60px rgba(255,45,120,0.4), 0 0 100px rgba(255,45,120,0.2);
+    }
+    50%{
+      text-shadow:0 0 30px rgba(255,45,120,1), 0 0 80px rgba(255,45,120,0.6), 0 0 140px rgba(255,45,120,0.3);
+    }
+  }
+
+  /* glitch on hover */
+  .title-viral:hover{animation:glitch 0.4s steps(2) forwards;}
+  @keyframes glitch{
+    0%{clip-path:inset(0 0 80% 0); transform:translateX(-4px);}
+    20%{clip-path:inset(30% 0 40% 0); transform:translateX(4px);}
+    40%{clip-path:inset(60% 0 10% 0); transform:translateX(-2px);}
+    60%{clip-path:inset(10% 0 60% 0); transform:translateX(2px);}
+    80%{clip-path:inset(80% 0 0 0); transform:translateX(-1px);}
+    100%{clip-path:inset(0); transform:translateX(0);}
+  }
+
+  .sub{
+    font-size:16px;
+    color:var(--text-dim);
+    margin-bottom:32px;
+    max-width:440px;
+    margin-left:auto; margin-right:auto;
+    line-height:1.6;
+  }
+
+  /* COUNTER STRIP */
+  .view-counter{
+    display:inline-flex; align-items:baseline; gap:6px;
+    background:rgba(255,209,102,0.07);
+    border:1px solid rgba(255,209,102,0.2);
+    border-radius:999px;
+    padding:6px 18px;
+    margin-bottom:28px;
+  }
+  .counter-num{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:28px;
+    color:var(--gold);
+    text-shadow:0 0 20px rgba(255,209,102,0.5);
+    letter-spacing:0.02em;
+  }
+  .counter-label{font-size:12px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em;}
+
+  .logistics{
+    display:flex; justify-content:center; gap:24px;
+    flex-wrap:wrap; margin-bottom:32px;
+    font-size:14px;
+  }
+  .logistics-item{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 18px;
+    backdrop-filter:blur(8px);
+  }
+  .logistics-item b{font-size:15px; font-weight:700; color:var(--text);}
+  .logistics-item span{color:var(--text-dim); font-size:11px; text-transform:uppercase; letter-spacing:0.06em;}
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    font-weight:800; font-size:16px;
+    padding:18px 32px; border-radius:14px;
+    text-decoration:none; color:#fff;
+    background:linear-gradient(135deg, #FF2D78 0%, #FF6FA5 100%);
+    box-shadow:0 8px 32px rgba(255,45,120,0.4), 0 0 0 1px rgba(255,45,120,0.3) inset;
+    width:100%; justify-content:center;
+    position:relative; overflow:hidden;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn::before{
+    content:'';
+    position:absolute; top:0; left:-100%; width:60%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation:shimmer 2.5s linear infinite;
+  }
+  @keyframes shimmer{to{left:160%;}}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 12px 40px rgba(255,45,120,0.55), 0 0 0 1px rgba(255,45,120,0.4) inset;}
+  .btn:active{transform:translateY(0);}
+
+  /* CUPOS PROGRESS */
+  .cupos-wrap{margin-top:20px;}
+  .cupos{font-size:13px; color:var(--text-dim); margin-bottom:8px;}
+  .cupos b{color:var(--accent-soft);}
+  .progress-bar{
+    height:4px; background:var(--line);
+    border-radius:999px; overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--accent), var(--accent-soft));
+    border-radius:999px;
+    box-shadow:0 0 8px var(--accent-glow);
+    transition:width 1.2s cubic-bezier(0.22,1,0.36,1);
+    width:0%;
+  }
+
+  /* SECTIONS */
+  section{padding:40px 0; border-top:1px solid var(--line); position:relative; z-index:1;}
+  .tag{
+    font-size:10px; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.1em; color:var(--accent-soft);
+    margin-bottom:10px;
+  }
+  h2{
+    font-family:'Bebas Neue', 'Arial Black', sans-serif;
+    font-size:clamp(28px, 7vw, 40px);
+    line-height:1;
+    letter-spacing:0.01em;
+    margin-bottom:20px;
+    text-transform:uppercase;
+  }
+
+  /* LEARN LIST */
+  .list{display:flex; flex-direction:column; gap:12px;}
+  .item{
+    display:flex; gap:12px; align-items:flex-start;
+    font-size:15px; color:var(--text-dim);
+    padding:14px 16px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid var(--line);
+    border-radius:12px;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .item:hover{border-color:rgba(255,45,120,0.2); background:rgba(255,45,120,0.04);}
+  .item-icon{
+    width:28px; height:28px; border-radius:8px;
+    background:rgba(255,45,120,0.12);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    font-size:14px;
+  }
+
+  /* CERTIFICADO — papel plegado con flip */
+  .cert-card{
+    position:relative;
+    perspective:1200px;
+    height:170px;
+    margin-bottom:28px;
+    cursor:pointer;
+    transition:height .5s cubic-bezier(.4,.2,.2,1);
+  }
+  .cert-card.flipped{height:362px;}
+  @media (min-width:480px){.cert-card.flipped{height:408px;}}
+  .cert-card-front, .cert-card-back{
+    position:absolute; inset:0;
+    border-radius:18px;
+    backface-visibility:hidden;
+    transition:transform .5s cubic-bezier(.4,.2,.2,1);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding:24px;
+  }
+  .cert-card-front{
+    background:linear-gradient(160deg, #14141F 0%, #0D0D18 100%);
+    border:1px solid rgba(255,209,102,0.3);
+    box-shadow:0 0 40px rgba(255,209,102,0.08);
+    transform:rotateY(0deg);
+  }
+  .cert-card-back{
+    background:#FBF6E9;
+    border:1px solid rgba(255,209,102,0.4);
+    transform:rotateY(180deg);
+    padding:8px 8px 4px;
+    border-radius:12px;
+    justify-content:space-between;
+  }
+  .cert-card.flipped .cert-card-front{transform:rotateY(180deg);}
+  .cert-card.flipped .cert-card-back{transform:rotateY(360deg);}
+  .cert-svg{width:100%; height:auto; display:block;}
+  .cert-back-foot{font-size:10px; color:#9A8A5A; font-weight:600; margin-top:4px;}
+  /* esquina doblada */
+  .cert-fold{
+    position:absolute; top:0; right:0;
+    width:0; height:0;
+    border-style:solid;
+    border-width:0 26px 26px 0;
+    border-color:transparent rgba(255,209,102,0.18) transparent transparent;
+    border-radius:0 18px 0 0;
+    z-index:2;
+    pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .cert-card.flipped .cert-fold{opacity:0;}
+  .cert-icon{font-size:30px; margin-bottom:10px;}
+  .cert-card-title{font-size:16px; font-weight:800; color:var(--text); margin-bottom:6px;}
+  .cert-card-sub{font-size:12px; color:var(--gold); font-weight:600;}
+  .cert-back-title{font-size:15px; font-weight:800; color:var(--gold); margin-bottom:8px;}
+  .cert-back-text{font-size:13px; color:var(--text-dim); line-height:1.5;}
+
+  /* PRICE BOX */
+  .price-box{
+    background:linear-gradient(160deg, #14141F 0%, #0D0D18 100%);
+    border:1px solid rgba(255,45,120,0.3);
+    border-radius:20px;
+    padding:32px 28px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 0 60px rgba(255,45,120,0.08);
+  }
+  .price-box::before{
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,45,120,0.5), transparent);
+  }
+  .price-old{color:var(--text-dim); text-decoration:line-through; font-size:14px; margin-bottom:4px;}
+  .price-new{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:72px; line-height:1;
+    color:var(--text);
+    text-shadow:0 0 30px rgba(244,242,239,0.1);
+    margin-bottom:4px;
+  }
+  .price-badge{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    font-size:11px; font-weight:800;
+    letter-spacing:0.06em; text-transform:uppercase;
+    padding:4px 10px; border-radius:999px;
+    margin-bottom:24px;
+  }
+
+  .form-fields{display:flex; flex-direction:column; gap:10px; margin:20px 0;}
+  .field-input{
+    width:100%;
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-size:15px; font-family:'DM Sans', sans-serif;
+    padding:14px 16px;
+    border-radius:10px;
+    outline:none;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .field-input::placeholder{color:var(--text-dim);}
+  .field-input:focus{border-color:rgba(255,45,120,0.4); background:rgba(255,45,120,0.04);}
+  select.field-input{
+    -webkit-appearance:none; -moz-appearance:none; appearance:none;
+    cursor:pointer; padding-right:40px;
+    background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237A7890' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center; background-size:16px;
+  }
+  select.field-input option{background:#111120; color:var(--text);}
+
+  /* VIDEO INTRO */
+  .intro-video-wrap{
+    position:relative;
+    width:100%; aspect-ratio:16/9;
+    border-radius:18px; overflow:hidden;
+    background:#000;
+    border:1px solid var(--line);
+    box-shadow:0 0 0 1px rgba(255,45,120,0.08), 0 20px 60px rgba(255,45,120,0.12);
+  }
+  .intro-video-wrap video{
+    width:100%; height:100%; display:block; object-fit:cover;
+  }
+  .video-placeholder{
+    width:100%; height:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:10px;
+    background:linear-gradient(160deg, var(--bg-soft), #000);
+  }
+  .video-placeholder-icon{font-size:34px; opacity:0.7;}
+  .video-placeholder-text{
+    font-size:13px; font-weight:700; letter-spacing:0.03em;
+    color:var(--text-dim); text-transform:uppercase;
+  }
+  .intro-video-wrap::after{
+    content:'';
+    position:absolute; inset:0;
+    border-radius:18px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04);
+    pointer-events:none;
+  }
+  .form-hint{font-size:12px; color:var(--text-dim); margin-top:12px;}
+
+  /* MÉTODO DE PAGO — selector tipo botón */
+  .pay-select-label{
+    font-size:12px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;
+    color:var(--text-dim);
+    text-align:left;
+    margin:18px 0 8px;
+  }
+  .pay-select-group{display:flex; gap:10px; margin-bottom:18px;}
+  .pay-option{
+    flex:1;
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-size:14px; font-weight:700;
+    font-family:'DM Sans', sans-serif;
+    padding:13px 10px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .pay-option:hover{border-color:rgba(255,45,120,0.3);}
+  .pay-option.selected{
+    background:rgba(255,45,120,0.12);
+    border-color:var(--accent);
+    box-shadow:0 0 0 1px rgba(255,45,120,0.2);
+  }
+  .pay-option:active{transform:scale(0.97);}
+
+  /* MÓDULOS DE APRENDIZAJE */
+  .modules{display:flex; flex-direction:column; gap:10px; margin-top:4px;}
+  .module{
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+    transition:border-color .2s ease;
+  }
+  .module:hover{border-color:rgba(255,45,120,0.2);}
+  .module.open{border-color:rgba(255,45,120,0.3);}
+  .module-header{
+    display:flex; align-items:center; gap:14px;
+    padding:16px 18px;
+    cursor:pointer;
+    user-select:none;
+    background:rgba(255,255,255,0.02);
+    transition:background .15s ease;
+  }
+  .module.open .module-header{background:rgba(255,45,120,0.05);}
+  .module-header:hover{background:rgba(255,255,255,0.04);}
+  .module-num{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:13px; letter-spacing:0.08em;
+    color:var(--accent); min-width:28px;
+    opacity:0.7;
+  }
+  .module-icon{font-size:20px; flex-shrink:0;}
+  .module-title{
+    flex:1;
+    font-size:15px; font-weight:600; color:var(--text);
+    line-height:1.3;
+  }
+  .module-arrow{
+    font-size:11px; color:var(--text-dim);
+    transition:transform .25s ease;
+    flex-shrink:0;
+  }
+  .module.open .module-arrow{transform:rotate(180deg);}
+  .module-body{
+    max-height:0; overflow:hidden;
+    transition:max-height .35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .module.open .module-body{max-height:600px;}
+  .module-inner{
+    padding:0 18px 18px 60px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .module-desc{
+    font-size:14px; color:var(--text-dim); line-height:1.6;
+    margin-bottom:6px;
+  }
+  .module-points{
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .module-point{
+    display:flex; align-items:flex-start; gap:8px;
+    font-size:13px; color:var(--text-dim);
+  }
+  .module-point::before{
+    content:'›';
+    color:var(--accent-soft); font-weight:700;
+    flex-shrink:0; margin-top:1px;
+  }
+  .module-tag{
+    display:inline-flex; align-items:center;
+    font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--accent-soft);
+    background:rgba(255,45,120,0.08);
+    border:1px solid rgba(255,45,120,0.15);
+    padding:3px 8px; border-radius:999px;
+    margin-top:4px; align-self:flex-start;
+  }
+
+  /* SEAT PICKER */
+  .seat-section{text-align:center;}
+  .screen{
+    width:100%; max-width:320px; margin:0 auto 8px;
+    height:6px; border-radius:50%;
+    background:linear-gradient(90deg, transparent, var(--accent-soft), transparent);
+    box-shadow:0 0 30px 8px rgba(255,111,165,0.4);
+  }
+  .screen-label{font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-dim); margin-bottom:24px;}
+  .seat-grid{
+    display:grid; grid-template-columns:repeat(7, 1fr);
+    gap:6px; max-width:340px; margin:0 auto 20px;
+  }
+  .seat{
+    width:100%; aspect-ratio:1;
+    border-radius:6px 6px 10px 10px;
+    background:#18182A; border:1px solid #2A2A40;
+    cursor:pointer;
+    transition:all .15s ease;
+    animation:seatIn .35s ease backwards;
+  }
+  .seat:hover:not(.taken):not(.selected){
+    border-color:var(--accent-soft);
+    background:#2A1A30;
+    box-shadow:0 0 10px rgba(255,45,120,0.2);
+    transform:translateY(-2px);
+  }
+  .seat.taken{background:#101018; border-color:#1A1A28; cursor:not-allowed; opacity:0.3;}
+  .seat.selected{
+    background:var(--accent);
+    border-color:var(--accent);
+    box-shadow:0 0 16px rgba(255,45,120,0.7), 0 0 30px rgba(255,45,120,0.3);
+    animation:selectPop .3s ease;
+  }
+  @keyframes seatIn{from{opacity:0; transform:scale(0.5);}to{opacity:1; transform:scale(1);}}
+  @keyframes selectPop{0%{transform:scale(1);}40%{transform:scale(1.25);}100%{transform:scale(1);}}
+
+  .legend{
+    display:flex; justify-content:center; gap:18px;
+    font-size:12px; color:var(--text-dim); margin-bottom:24px;
+  }
+  .legend-item{display:flex; align-items:center; gap:6px;}
+  .legend-box{width:12px; height:12px; border-radius:3px;}
+  .legend-box.free{background:#18182A; border:1px solid #2A2A40;}
+  .legend-box.taken{background:#101018; opacity:0.3; border:1px solid #1A1A28;}
+  .legend-box.selected{background:var(--accent); box-shadow:0 0 8px rgba(255,45,120,0.5);}
+  .seat-status{font-size:14px; color:var(--text-dim); margin-bottom:18px;}
+  .seat-status b{color:var(--accent-soft);}
+  .btn-ghost-seats{
+    display:inline-block;
+    background:transparent; border:1px solid var(--line);
+    color:var(--text-dim); font-size:13px; font-weight:600; font-family:'DM Sans', sans-serif;
+    padding:10px 18px; border-radius:10px; cursor:pointer; margin-bottom:20px;
+    transition:all .15s ease;
+  }
+  .btn-ghost-seats:hover{border-color:rgba(255,45,120,0.3); color:var(--accent-soft);}
+
+  /* UBICACIÓN + MAPA */
+  .ubicacion-grid{
+    display:grid; grid-template-columns:1fr 1.1fr; gap:24px;
+    align-items:stretch;
+  }
+  @media (max-width:680px){ .ubicacion-grid{grid-template-columns:1fr;} }
+  .ubicacion-card{
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:24px;
+    display:flex; flex-direction:column; gap:18px;
+  }
+  .ubicacion-row{display:flex; align-items:flex-start; gap:14px;}
+  .ubicacion-icon{
+    width:38px; height:38px; flex-shrink:0;
+    border-radius:10px;
+    background:rgba(255,45,120,0.1);
+    border:1px solid rgba(255,45,120,0.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px;
+  }
+  .ubicacion-row b{display:block; font-size:15px; color:var(--text); margin-bottom:2px;}
+  .ubicacion-row span{display:block; font-size:13px; color:var(--text-dim); line-height:1.5;}
+  .ubicacion-divider{height:1px; background:var(--line);}
+  .ubicacion-cta{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    font-size:13px; font-weight:700; color:var(--accent-soft);
+    border:1px solid rgba(255,45,120,0.3); border-radius:10px;
+    padding:10px 16px; text-decoration:none;
+    transition:all .15s ease;
+  }
+  .ubicacion-cta:hover{background:rgba(255,45,120,0.08); border-color:rgba(255,45,120,0.5);}
+  .ubicacion-map{
+    border-radius:16px; overflow:hidden;
+    border:1px solid var(--line);
+    min-height:280px;
+    filter:saturate(0.4) brightness(0.85) invert(0.92) contrast(0.95) hue-rotate(180deg);
+  }
+  .ubicacion-map iframe{width:100%; height:100%; min-height:280px; display:block; border:0;}
+
+  /* VIDEOS */
+  .video-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px;}
+  .video-grid-extra{display:none; margin-top:18px; grid-template-columns:1fr; max-width:280px; margin-left:auto; margin-right:auto;}
+  .video-grid-extra.show{display:grid;}
+  .result-links-extra{display:none; flex-direction:column; gap:10px; margin-top:18px;}
+  .result-links-extra.show{display:flex;}
+  .result-link-item{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 16px; border-radius:12px;
+    background:var(--bg-soft); border:1px solid var(--line);
+    text-decoration:none; transition:border-color .15s ease, transform .15s ease;
+  }
+  .result-link-item:hover{border-color:rgba(255,45,120,0.35); transform:translateY(-1px);}
+  .result-link-brand{font-weight:700; font-size:13.5px; color:var(--text);}
+  .result-link-stat{font-weight:800; font-size:13px; color:var(--accent-soft); white-space:nowrap;}
+  .video-item{display:flex; flex-direction:column; gap:8px;}
+  .video-meta{display:flex; justify-content:space-between; align-items:baseline; font-size:12px;}
+  .video-brand{font-weight:700; color:var(--text);}
+  .video-stat{color:var(--accent-soft); font-weight:800; font-size:13px;}
+  .video-frame{
+    position:relative; width:100%; aspect-ratio:9/16;
+    border-radius:14px; overflow:hidden;
+    background:linear-gradient(160deg, #14141F 0%, #080810 60%, #160E18 100%);
+    border:1px solid var(--line); cursor:pointer;
+    transition:border-color .2s ease, transform .2s ease;
+  }
+  .video-frame:hover{border-color:rgba(255,45,120,0.3); transform:translateY(-3px);}
+  .video-frame .play-btn{
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    width:52px; height:52px; border-radius:50%;
+    background:linear-gradient(135deg, var(--accent), #FF6FA5);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 30px rgba(255,45,120,0.5);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .video-frame:hover .play-btn{transform:translate(-50%,-50%) scale(1.12); box-shadow:0 0 50px rgba(255,45,120,0.7);}
+  .video-frame .play-btn svg{width:20px; height:20px; fill:#fff; margin-left:2px;}
+  .video-frame .frame-label{
+    position:absolute; bottom:14px; left:0; right:0;
+    text-align:center; font-size:11px; color:var(--text-dim); letter-spacing:0.04em;
+  }
+  .video-frame.loaded{cursor:default; background:transparent; border:none;}
+  .video-frame.loaded .play-btn, .video-frame.loaded .frame-label{display:none;}
+  .video-grid blockquote{border-radius:14px; overflow:hidden; width:100%; max-width:100%;}
+  @media (max-width:480px){.video-grid{grid-template-columns:1fr 1fr;}}
+
+  /* SCAN LINE OVERLAY — subtle CRT vibe */
+  .scanlines{
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px);
+    pointer-events:none; z-index:0; opacity:0.4;
+  }
+
+  footer{padding:32px 0; text-align:center; color:var(--text-dim); font-size:12px; border-top:1px solid var(--line); position:relative; z-index:1;}
+
+  /* PROCESO */
+  .section-proceso{position:relative; z-index:1;}
+  .proceso-steps{display:flex; flex-direction:column; gap:0; margin-bottom:28px;}
+
+  .paso{display:flex; gap:0; align-items:flex-start;}
+  .paso-left{
+    display:flex; flex-direction:column; align-items:center;
+    flex-shrink:0; width:52px; padding-top:4px;
+  }
+  .paso-num{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:13px; letter-spacing:0.1em;
+    color:#fff;
+    background:var(--accent);
+    width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 14px rgba(255,45,120,0.5);
+    flex-shrink:0; position:relative; z-index:1;
+  }
+  .paso-line{
+    width:2px; flex:1; min-height:40px;
+    background:linear-gradient(to bottom, rgba(255,45,120,0.4), rgba(255,45,120,0.05));
+    margin:4px 0;
+  }
+
+  .paso-content{
+    flex:1; padding:4px 0 18px 16px;
+  }
+  .paso-time{
+    font-size:10px; text-transform:uppercase; letter-spacing:0.1em;
+    color:var(--accent-soft); font-weight:700; margin-bottom:4px;
+  }
+  .paso-title{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:22px; letter-spacing:0.01em;
+    color:var(--text); margin-bottom:8px; line-height:1;
+  }
+  .paso-desc{
+    font-size:14px; color:var(--text-dim); line-height:1.6; margin-bottom:10px;
+  }
+  .paso-pills{display:flex; flex-wrap:wrap; gap:6px;}
+  .paso-pills span{
+    font-size:11px; font-weight:600;
+    color:var(--text-dim);
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--line);
+    padding:3px 10px; border-radius:999px;
+  }
+
+  /* RESULTADO FINAL */
+  .resultado-box{
+    display:flex; gap:14px; align-items:flex-start;
+    background:linear-gradient(135deg, rgba(255,45,120,0.08) 0%, rgba(255,209,102,0.04) 100%);
+    border:1px solid rgba(255,45,120,0.25);
+    border-radius:16px; padding:20px;
+    margin-top:8px;
+  }
+  .resultado-icon{font-size:28px; flex-shrink:0; margin-top:2px;}
+  .resultado-label{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.08em;
+    color:var(--text-dim); font-weight:700; margin-bottom:10px;
+  }
+  .resultado-items{display:flex; flex-direction:column; gap:6px;}
+  .resultado-items span{
+    font-size:14px; color:var(--text); font-weight:600;
+  }
+
+  /* INVESTMENT LOCKED STATE */
+  .section-invest{position:relative;}
+  .invest-lock-overlay{
+    position:absolute; inset:0;
+    background:rgba(8,8,16,0.72);
+    backdrop-filter:blur(4px);
+    border-radius:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+    z-index:10;
+    transition:opacity .5s ease;
+    pointer-events:all;
+  }
+  .invest-lock-overlay.hidden{opacity:0; pointer-events:none;}
+  .lock-icon{
+    width:52px; height:52px; border-radius:50%;
+    background:rgba(255,255,255,0.05);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px;
+  }
+  .lock-msg{font-size:14px; color:var(--text-dim); text-align:center; line-height:1.5;}
+  .lock-msg b{color:var(--accent-soft); display:block; font-size:15px; margin-bottom:2px;}
+  .lock-cta{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:13px; font-weight:700; color:var(--accent-soft);
+    background:rgba(255,45,120,0.08);
+    border:1px solid rgba(255,45,120,0.25);
+    padding:8px 18px; border-radius:999px;
+    text-decoration:none; cursor:pointer;
+    transition:background .15s ease;
+  }
+  .lock-cta:hover{background:rgba(255,45,120,0.15);}
+
+  /* SELECTED SEAT BADGE inside price-box */
+  .seat-badge{
+    display:none;
+    align-items:center; gap:10px;
+    background:rgba(255,45,120,0.08);
+    border:1px solid rgba(255,45,120,0.25);
+    border-radius:12px;
+    padding:12px 16px;
+    margin-bottom:20px;
+    text-align:left;
+    animation:badgePop .4s cubic-bezier(0.22,1,0.36,1);
+  }
+  .seat-badge.visible{display:flex;}
+  @keyframes badgePop{from{opacity:0;transform:scale(0.9) translateY(6px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  .seat-badge-icon{
+    width:36px; height:36px; border-radius:9px;
+    background:var(--accent);
+    box-shadow:0 0 16px rgba(255,45,120,0.5);
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; flex-shrink:0;
+  }
+  .seat-badge-info{flex:1;}
+  .seat-badge-label{font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim); margin-bottom:2px;}
+  .seat-badge-value{font-family:'Bebas Neue', sans-serif; font-size:20px; letter-spacing:0.02em; color:var(--text); line-height:1;}
+  .seat-badge-change{font-size:11px; color:var(--text-dim); text-decoration:underline; cursor:pointer; margin-top:2px; display:inline-block;}
+  .seat-badge-change:hover{color:var(--accent-soft);}
+
+  /* REVEAL */
+  .reveal{opacity:0; transform:translateY(20px); transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in-view{opacity:1; transform:translateY(0);}
+  @keyframes heroFade{from{opacity:0; transform:translateY(12px);}to{opacity:1; transform:translateY(0);}}
+  .hero > .wrap > *{animation:heroFade .7s ease backwards;}
+  .hero > .wrap > *:nth-child(1){animation-delay:.06s;}
+  .hero > .wrap > *:nth-child(2){animation-delay:.14s;}
+  .hero > .wrap > *:nth-child(3){animation-delay:.22s;}
+  .hero > .wrap > *:nth-child(4){animation-delay:.30s;}
+  .hero > .wrap > *:nth-child(5){animation-delay:.38s;}
+  .hero > .wrap > *:nth-child(6){animation-delay:.46s;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important; opacity:1 !important; transform:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div class="scanlines"></div>
+
+<div class="hero">
+  <div class="bokeh bokeh-1"></div>
+  <div class="bokeh bokeh-2"></div>
+  <div class="bokeh bokeh-3"></div>
+  <div class="wrap">
+    <img src="foto.png" alt="" class="photo" style="display:none;">
+    <div class="eyebrow"><span class="dot"></span> Cupos limitados — Ayacucho</div>
+    <h1>
+      <span class="title-line1">Cómo crear contenido</span>
+      <span class="title-viral">viral</span>
+    </h1>
+    <p class="sub">Taller presencial de 2 horas. Aprende el método con el que generé más de 1 millón de vistas creando contenido para mi marca personal y para negocios reales.</p>
+
+    <div class="view-counter">
+      <span class="counter-num" id="counterNum">0</span>
+      <span class="counter-label">vistas generadas</span>
+    </div>
+
+    <div class="logistics">
+      <div class="logistics-item"><b id="fecha">Sáb 27 jun · 4PM</b><span>Fecha y hora</span></div>
+      <div class="logistics-item"><b id="lugar">Cámara de Comercio</b><span>Lugar — Ayacucho</span></div>
+      <div class="logistics-item"><b>2 horas</b><span>Duración</span></div>
+    </div>
+
+    <a href="#reservar" class="btn">Reservar mi cupo — S/ 50</a>
+    <div class="cupos-wrap">
+      <div class="cupos">Quedan <b id="cuposNum">49</b> de 49 cupos disponibles</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VIDEO DE INTRODUCCIÓN ══ -->
+<section>
+  <div class="wrap-wide">
+    <div class="tag">Antes de reservar</div>
+    <h2 style="margin-bottom:14px;">Mira de qué<br><span style="color:var(--accent-soft);">se trata</span></h2>
+    <div class="intro-video-wrap" id="introVideoWrap">
+      <!--
+        👉 PARA AGREGAR TU VIDEO CUANDO LO GRABES:
+        1) Borra el <div class="video-placeholder">...</div> de abajo.
+        2) Descomenta el bloque <video>...</video>.
+        3) Reemplaza "video-intro.mp4" con el nombre real de tu archivo
+           y colócalo en la misma carpeta que este index.html.
+        Opcional: agrega poster="tu-imagen-portada.jpg" para una miniatura
+        antes de darle play.
+      -->
+      <div class="video-placeholder">
+        <div class="video-placeholder-icon">🎬</div>
+        <div class="video-placeholder-text">Video disponible pronto</div>
+      </div>
+      <!--
+      <video controls preload="metadata" poster="">
+        <source src="video-intro.mp4" type="video/mp4">
+        Tu navegador no soporta el video.
+      </video>
+      -->
+    </div>
+  </div>
+</section>
+
+<!-- ① PRUEBA SOCIAL — videos reales primero para generar confianza -->
+<section>
+  <div class="wrap-wide">
+    <div class="tag">Resultados reales</div>
+    <h2 style="margin-bottom:6px;">Negocios de Ayacucho<br>que ya lo están logrando</h2>
+    <p class="sub" style="margin-bottom:20px; text-align:left;">Estos son videos que creé para emprendedores locales usando el mismo método que vas a aprender.</p>
+    <div class="video-grid">
+      <div class="video-item">
+        <div class="video-meta"><span class="video-brand">Hotel Mi Leal</span><span class="video-stat">210K vistas</span></div>
+        <div class="video-frame" data-cite="https://www.tiktok.com/@hospedaje.mileal/video/7604687421791358228" data-id="7604687421791358228">
+          <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="frame-label">Toca para reproducir</div>
+        </div>
+      </div>
+      <div class="video-item">
+        <div class="video-meta"><span class="video-brand">9 Meses (tienda)</span><span class="video-stat">116K vistas</span></div>
+        <div class="video-frame" data-cite="https://www.tiktok.com/@9.meses2/video/7646553736990493959" data-id="7646553736990493959">
+          <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="frame-label">Toca para reproducir</div>
+        </div>
+      </div>
+      <div class="video-item">
+        <div class="video-meta"><span class="video-brand">Mi cuenta personal</span><span class="video-stat">93K vistas</span></div>
+        <div class="video-frame" data-cite="https://www.tiktok.com/@aroon_bropro/video/7587479029998030101" data-id="7587479029998030101">
+          <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="frame-label">Toca para reproducir</div>
+        </div>
+      </div>
+      <div class="video-item">
+        <div class="video-meta"><span class="video-brand">New York Café Pizzería</span><span class="video-stat">80K vistas</span></div>
+        <div class="video-frame" data-cite="https://www.tiktok.com/@new.york.caf.pizz/video/7643958134385528071" data-id="7643958134385528071">
+          <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="frame-label">Toca para reproducir</div>
+        </div>
+      </div>
+    </div>
+
+    <!--
+      👉 PARA AGREGAR MÁS NEGOCIOS CON VIDEO EMBEBIDO:
+      Copia un bloque <div class="video-item">...</div> completo y pégalo
+      dentro de "video-grid-extra". Necesitas el link DIRECTO del video
+      (con /video/NÚMERO al final), no solo el del perfil.
+
+      👉 PARA AGREGAR NEGOCIOS SOLO COMO LINK (sin video embebido):
+      Copia una línea <a class="result-link-item">...</a> y pégala
+      dentro de "result-links-extra".
+    -->
+    <div class="video-grid video-grid-extra" id="videoGridExtra">
+      <div class="video-item">
+        <div class="video-meta"><span class="video-brand">Spa Amén Estética</span><span class="video-stat">23K vistas</span></div>
+        <div class="video-frame" data-cite="https://www.tiktok.com/@amenesteticaspa/video/7598038410711846151" data-id="7598038410711846151">
+          <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="frame-label">Toca para reproducir</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-links-extra" id="resultLinksExtra">
+      <a class="result-link-item" href="https://www.tiktok.com/@hospedaje.mileal" target="_blank" rel="noopener">
+        <span class="result-link-brand">Hotel Mi Leal</span>
+        <span class="result-link-stat">+210K vistas →</span>
+      </a>
+      <a class="result-link-item" href="https://www.tiktok.com/@new.york.caf.pizz" target="_blank" rel="noopener">
+        <span class="result-link-brand">New York Café Pizzería</span>
+        <span class="result-link-stat">+80K vistas →</span>
+      </a>
+      <a class="result-link-item" href="https://www.tiktok.com/@babyspaluzdevida-" target="_blank" rel="noopener">
+        <span class="result-link-brand">Baby Spa Luz de Vida</span>
+        <span class="result-link-stat">+100K vistas →</span>
+      </a>
+      <a class="result-link-item" href="https://www.tiktok.com/@aroonconstruye" target="_blank" rel="noopener">
+        <span class="result-link-brand">Aroon Construye (terrenos)</span>
+        <span class="result-link-stat">+20K vistas →</span>
+      </a>
+      <a class="result-link-item" href="https://www.tiktok.com/@aroonberner2" target="_blank" rel="noopener">
+        <span class="result-link-brand">Aroon Berner (cuenta secundaria)</span>
+        <span class="result-link-stat">+90K vistas →</span>
+      </a>
+      <a class="result-link-item" href="https://www.tiktok.com/@nico_explora0" target="_blank" rel="noopener">
+        <span class="result-link-brand">Nico Explora (colaboración)</span>
+        <span class="result-link-stat">+80K vistas →</span>
+      </a>
+      <a class="result-link-item" href="https://www.tiktok.com/@dormilones.ayacuc" target="_blank" rel="noopener">
+        <span class="result-link-brand">Dormilones Ayacucho</span>
+        <span class="result-link-stat">+30K vistas →</span>
+      </a>
+    </div>
+
+    <button class="btn-ghost-seats" id="verMasResultados" style="display:block; margin:20px auto 0;" onclick="toggleMasResultados(this)">Ver más resultados ↓</button>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="tag">Qué aprenderás</div>
+    <h2>El método completo</h2>
+    <p class="sub" style="margin-bottom:24px; text-align:left;">6 bloques prácticos para que salgas del taller con todo listo para publicar contenido que la gente quiere ver.</p>
+
+    <div class="modules">
+
+      <!-- 1 -->
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header">
+          <span class="module-num">01</span>
+          <span class="module-icon">🎙️</span>
+          <span class="module-title">Cómo hablar frente a cámara con confianza</span>
+          <span class="module-arrow">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-inner">
+            <p class="module-desc">No importa si nunca has grabado un video. Te enseño las técnicas concretas para sonar natural, proyectar autoridad y conectar con quien te ve — sin leer guión ni parecer robot.</p>
+            <div class="module-points">
+              <div class="module-point">Postura, mirada y energía que transmite confianza</div>
+              <div class="module-point">Cómo mejorar tu voz: ritmo, pausas y claridad</div>
+              <div class="module-point">Ejercicios rápidos para calentar antes de grabar</div>
+              <div class="module-point">Errores comunes que hacen que la gente pare el video</div>
+            </div>
+            <span class="module-tag">✦ Práctica en vivo</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header">
+          <span class="module-num">02</span>
+          <span class="module-icon">📖</span>
+          <span class="module-title">Storytelling: historias que la gente ve hasta el final</span>
+          <span class="module-arrow">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-inner">
+            <p class="module-desc">El secreto de los videos virales no es el baile ni el filtro — es la historia. Aprenderás la estructura exacta que engancha desde el primer segundo y no suelta al espectador.</p>
+            <div class="module-points">
+              <div class="module-point">La estructura de 3 actos adaptada a videos cortos</div>
+              <div class="module-point">Cómo abrir un video para que nadie lo pase</div>
+              <div class="module-point">El gancho emocional: qué hace que la gente comparta</div>
+              <div class="module-point">Cómo cerrar con un llamado a la acción que funciona</div>
+            </div>
+            <span class="module-tag">✦ Con ejemplos reales de mis videos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header">
+          <span class="module-num">03</span>
+          <span class="module-icon">💡</span>
+          <span class="module-title">Ideas ganadoras: cómo encontrar temas con potencial viral</span>
+          <span class="module-arrow">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-inner">
+            <p class="module-desc">La mayoría no sabe de qué hablar. Te enseño el sistema que uso para generar ideas que ya funcionan — usando lo que el algoritmo ya está mostrando.</p>
+            <div class="module-points">
+              <div class="module-point">Cómo leer el algoritmo de TikTok e Instagram para encontrar tendencias</div>
+              <div class="module-point">El método de las 3 capas: tema + ángulo + formato</div>
+              <div class="module-point">Cómo adaptar ideas virales a tu marca o negocio</div>
+              <div class="module-point">Plantilla de banco de ideas para nunca quedarte sin contenido</div>
+            </div>
+            <span class="module-tag">✦ Sistema reutilizable</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header">
+          <span class="module-num">04</span>
+          <span class="module-icon">🎬</span>
+          <span class="module-title">Grabación: cómo filmar bien con solo tu celular</span>
+          <span class="module-arrow">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-inner">
+            <p class="module-desc">No necesitas cámara profesional ni estudio. Con tu celular y lo que ya tienes en casa puedes grabar video de calidad. Te enseño exactamente cómo.</p>
+            <div class="module-points">
+              <div class="module-point">Ajustes de cámara para que el video se vea nítido</div>
+              <div class="module-point">Iluminación natural y artificial sin gastar nada</div>
+              <div class="module-point">Ángulos y encuadres que hacen ver el video profesional</div>
+              <div class="module-point">Cómo grabar buen audio sin micrófono externo</div>
+            </div>
+            <span class="module-tag">✦ Sesión práctica de grabación</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header">
+          <span class="module-num">05</span>
+          <span class="module-icon">✂️</span>
+          <span class="module-title">Edición en CapCut: paso a paso desde cero</span>
+          <span class="module-arrow">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-inner">
+            <p class="module-desc">Aprenderás a editar videos completos en CapCut usando mis propias plantillas — las mismas con las que hice los videos de 80K, 116K y 210K vistas.</p>
+            <div class="module-points">
+              <div class="module-point">Interfaz de CapCut explicada en 10 minutos</div>
+              <div class="module-point">Cortes, ritmo y transiciones que retienen atención</div>
+              <div class="module-point">Subtítulos automáticos, música y efectos de sonido</div>
+              <div class="module-point">Acceso a mis plantillas personales ya listas para usar</div>
+            </div>
+            <span class="module-tag">✦ Plantillas exclusivas incluidas</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="module" onclick="toggleModule(this)">
+        <div class="module-header">
+          <span class="module-num">06</span>
+          <span class="module-icon">🌟</span>
+          <span class="module-title">Cómo construir presencia y ser reconocido en tu comunidad</span>
+          <span class="module-arrow">▼</span>
+        </div>
+        <div class="module-body">
+          <div class="module-inner">
+            <p class="module-desc">Publicar videos no es suficiente. Te enseño cómo posicionarte como referente local — para que la gente en Ayacucho te reconozca, te recomiende y confíe en tu marca.</p>
+            <div class="module-points">
+              <div class="module-point">Cómo definir tu nicho y diferenciarte de la competencia</div>
+              <div class="module-point">Estrategia de consistencia sin agotarte</div>
+              <div class="module-point">Cómo interactuar con tu audiencia para generar comunidad</div>
+              <div class="module-point">El camino de creador local a referente regional</div>
+            </div>
+            <span class="module-tag">✦ Mentalidad + estrategia</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ CERTIFICADO ══ -->
+<section>
+  <div class="wrap">
+    <div class="tag">Bonus al terminar</div>
+    <h2 style="margin-bottom:20px; text-align:center;">Te llevas tu<br><span style="color:var(--accent-soft);">certificado</span></h2>
+
+    <div class="cert-card" id="certCard">
+      <div class="cert-fold"></div>
+      <div class="cert-card-front">
+        <div class="cert-icon">📜</div>
+        <div class="cert-card-title">Certificación internacional incluida</div>
+        <div class="cert-card-sub">Toca para ver tu certificado →</div>
+      </div>
+      <div class="cert-card-back">
+        <!--
+          👉 El certificado ya incluye el nombre "Berner Aroon Arestegui"
+          como quien otorga la certificación. El campo
+          "[NOMBRE DEL PARTICIPANTE]" se queda igual — es solo una
+          vista previa; el certificado real con el nombre de cada
+          persona lo entregas aparte, después del taller.
+        -->
+        <svg class="cert-svg" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#D4AF37"/>
+              <stop offset="100%" stop-color="#9C7A24"/>
+            </linearGradient>
+            <linearGradient id="sealGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F3E2A8"/>
+              <stop offset="50%" stop-color="#D4AF37"/>
+              <stop offset="100%" stop-color="#9C7A24"/>
+            </linearGradient>
+            <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFFDF7"/>
+              <stop offset="100%" stop-color="#F8F0DC"/>
+            </linearGradient>
+            <radialGradient id="bgVignette" cx="50%" cy="40%" r="75%">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#C9A23B" stop-opacity="0.07"/>
+            </radialGradient>
+            <pattern id="guilloche" width="22" height="22" patternUnits="userSpaceOnUse">
+              <circle cx="11" cy="11" r="9" fill="none" stroke="#C9A23B" stroke-width="0.35" opacity="0.35"/>
+            </pattern>
+          </defs>
+
+          <!-- fondo -->
+          <rect x="0" y="0" width="600" height="400" fill="url(#bgGrad)"/>
+          <rect x="0" y="0" width="600" height="400" fill="url(#bgVignette)"/>
+          <rect x="0" y="0" width="600" height="400" fill="url(#guilloche)"/>
+
+          <!-- marco exterior triple -->
+          <rect x="4" y="4" width="592" height="392" rx="6" fill="none" stroke="#C9A23B" stroke-width="5"/>
+          <rect x="13" y="13" width="574" height="374" rx="3" fill="none" stroke="#9C7A24" stroke-width="1"/>
+          <rect x="19" y="19" width="562" height="362" rx="2" fill="none" stroke="#C9A23B" stroke-width="0.6"/>
+
+          <!-- esquinas ornamentales -->
+          <g fill="none" stroke="#C9A23B" stroke-width="1.4">
+            <path d="M19 50 L19 19 L50 19"/>
+            <path d="M581 50 L581 19 L550 19"/>
+            <path d="M19 350 L19 381 L50 381"/>
+            <path d="M581 350 L581 381 L550 381"/>
+          </g>
+          <g fill="#C9A23B">
+            <circle cx="19" cy="19" r="3.2"/>
+            <circle cx="581" cy="19" r="3.2"/>
+            <circle cx="19" cy="381" r="3.2"/>
+            <circle cx="581" cy="381" r="3.2"/>
+          </g>
+          <g opacity="0.85">
+            <path d="M30 30 q10 -4 16 4 q-10 2 -16 -4 Z" fill="#C9A23B"/>
+            <path d="M570 30 q-10 -4 -16 4 q10 2 16 -4 Z" fill="#C9A23B"/>
+            <path d="M30 370 q10 4 16 -4 q-10 -2 -16 4 Z" fill="#C9A23B"/>
+            <path d="M570 370 q-10 4 -16 -4 q10 -2 16 4 Z" fill="#C9A23B"/>
+          </g>
+
+          <!-- emblema laurel superior -->
+          <g transform="translate(300,52)" opacity="0.9">
+            <path d="M-30 0 Q-16 -14 0 -10 Q16 -14 30 0" fill="none" stroke="#C9A23B" stroke-width="1.2"/>
+            <circle cx="0" cy="-9" r="3.5" fill="#D4AF37"/>
+          </g>
+
+          <text x="300" y="40" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="11" letter-spacing="5" fill="#9C7A24">TALLER PRESENCIAL</text>
+          <text x="300" y="76" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="22" letter-spacing="5" fill="#5A4A1F">CERTIFICADO</text>
+          <text x="300" y="92" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="10.5" letter-spacing="4" fill="#8A6D1F">DE PARTICIPACIÓN</text>
+
+          <path d="M220 104 L280 110 L300 106 L320 110 L380 104" fill="none" stroke="#C9A23B" stroke-width="1"/>
+          <circle cx="300" cy="106" r="2.2" fill="#C9A23B"/>
+
+          <text x="300" y="138" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="24" letter-spacing="1.5" fill="#211A0C">BERNER AROON ARESTEGUI</text>
+          <text x="300" y="158" text-anchor="middle" font-family="'DM Sans', sans-serif" font-style="italic" font-size="11.5" fill="#7A6A3A">otorga el presente certificado a</text>
+
+          <text x="300" y="198" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="27" fill="#1A1610">[NOMBRE DEL PARTICIPANTE]</text>
+          <path d="M165 213 Q300 222 435 213" fill="none" stroke="#C9A23B" stroke-width="0.9"/>
+
+          <text x="300" y="241" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="11.5" fill="#3A3020">por completar satisfactoriamente el taller presencial</text>
+          <text x="300" y="261" text-anchor="middle" font-family="'DM Sans', sans-serif" font-weight="700" font-size="14.5" letter-spacing="0.5" fill="#1A1610">"CREACIÓN DE CONTENIDO VIRAL"</text>
+          <text x="300" y="280" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="10.5" letter-spacing="0.5" fill="#7A6A3A">AYACUCHO, PERÚ · 2 HORAS DE DURACIÓN</text>
+
+          <line x1="48" y1="305" x2="552" y2="305" stroke="#D8C792" stroke-width="0.6"/>
+
+          <!-- sello con relieve -->
+          <g transform="translate(118,350)">
+            <path d="M-9,28 L-9,52 L0,43 L9,52 L9,28 Z" fill="url(#ribbon)"/>
+            <path d="M-9,28 L-9,52 L0,43 L0,30 Z" fill="#000000" opacity="0.08"/>
+            <circle r="33" fill="#9C7A24" opacity="0.25"/>
+            <circle r="31" fill="url(#sealGrad)"/>
+            <circle r="31" fill="none" stroke="#7A5E1A" stroke-width="0.8"/>
+            <circle r="25.5" fill="#FBF6E9"/>
+            <circle r="25.5" fill="none" stroke="#9C7A24" stroke-width="1"/>
+            <circle r="21.5" fill="none" stroke="#C9A23B" stroke-width="0.5"/>
+            <text x="0" y="-7" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="13" letter-spacing="1" fill="#7A5E1A">CMCI</text>
+            <text x="0" y="3" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="5.5" letter-spacing="0.5" fill="#8A6D1F">SELLO OFICIAL</text>
+            <path d="M-15 9 Q0 16 15 9" fill="none" stroke="#9C7A24" stroke-width="0.6"/>
+          </g>
+
+          <!-- firma -->
+          <g transform="translate(440,322)">
+            <path d="M-58,18 Q-40,-2 -22,12 Q-10,22 4,2 Q14,-10 24,8 Q32,18 48,6" fill="none" stroke="#2A2210" stroke-width="1.1" stroke-linecap="round"/>
+          </g>
+          <line x1="378" y1="338" x2="502" y2="338" stroke="#9C7A24" stroke-width="0.7"/>
+          <text x="440" y="351" text-anchor="middle" font-family="'DM Sans', sans-serif" font-style="italic" font-size="9.5" fill="#3A3020">Berner Aroon Arestegui</text>
+          <text x="440" y="362" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="8" letter-spacing="0.4" fill="#7A6A3A">FIRMA AUTORIZADA</text>
+
+          <text x="300" y="380" text-anchor="middle" font-family="'DM Sans', sans-serif" font-weight="700" font-size="9.5" letter-spacing="0.6" fill="#5A4A1F">CERTIFICACIÓN INTERNACIONAL AVALADA POR CLASSIC MEDIA CHINA INTERNACIONAL</text>
+          <text x="300" y="392" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="8.5" fill="#9A8A5A">Productora internacional de contenido chino</text>
+        </svg>
+        <div class="cert-back-foot">Toca para volver ←</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ UBICACIÓN + HORARIO ══ -->
+<section>
+  <div class="wrap-wide">
+    <div class="tag">Dónde y cuándo</div>
+    <h2 style="margin-bottom:20px;">Detalles del<br><span style="color:var(--accent-soft);">taller</span></h2>
+
+    <div class="ubicacion-grid">
+      <div class="ubicacion-card">
+        <div class="ubicacion-row">
+          <div class="ubicacion-icon">📅</div>
+          <div>
+            <b>Sábado 27 de junio</b>
+            <span>Fecha del taller</span>
+          </div>
+        </div>
+        <div class="ubicacion-divider"></div>
+        <div class="ubicacion-row">
+          <div class="ubicacion-icon">🕓</div>
+          <div>
+            <b>4:00 PM — 6:00 PM</b>
+            <span>Duración: 2 horas</span>
+          </div>
+        </div>
+        <div class="ubicacion-divider"></div>
+        <div class="ubicacion-row">
+          <div class="ubicacion-icon">📍</div>
+          <div>
+            <b>Cámara de Comercio de Ayacucho</b>
+            <span>San Martín 432, Ayacucho 05003</span>
+          </div>
+        </div>
+        <a class="ubicacion-cta" href="https://www.google.com/maps/search/?api=1&query=C%C3%A1mara+de+Comercio+de+Ayacucho%2C+San+Mart%C3%ADn+432%2C+Ayacucho" target="_blank" rel="noopener">📍 Cómo llegar (Google Maps) →</a>
+      </div>
+
+      <div class="ubicacion-map">
+        <iframe
+          src="https://www.google.com/maps?q=C%C3%A1mara%20de%20Comercio%20de%20Ayacucho%2C%20San%20Mart%C3%ADn%20432%2C%20Ayacucho&output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seat-section" id="reservar">
+  <div class="wrap">
+    <div class="tag">Elige tu asiento</div>
+    <h2 style="margin-bottom:6px;">Reserva tu lugar</h2>
+    <p class="sub" style="margin-bottom:28px;">Toca un asiento disponible para reservarlo</p>
+
+    <div class="screen"></div>
+    <div class="screen-label">Frente</div>
+
+    <div class="seat-grid" id="seatGrid"></div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-box free"></span>Libre</div>
+      <div class="legend-item"><span class="legend-box selected"></span>Tu asiento</div>
+      <div class="legend-item"><span class="legend-box taken"></span>Ocupado</div>
+    </div>
+
+    <div class="seat-status" id="seatStatus">Selecciona un asiento para continuar</div>
+  </div>
+</section>
+
+<section class="section-invest">
+  <!-- LOCK OVERLAY -->
+  <div class="invest-lock-overlay" id="investLock">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-msg"><b>Elige tu asiento primero</b>Para continuar, selecciona un lugar en el mapa de arriba</div>
+    <a class="lock-cta" href="#reservar">↑ Ir a elegir asiento</a>
+  </div>
+
+  <div class="wrap">
+    <div class="tag">Inversión</div>
+    <div class="price-box">
+      <!-- SEAT BADGE -->
+      <div class="seat-badge" id="seatBadge">
+        <div class="seat-badge-icon">💺</div>
+        <div class="seat-badge-info">
+          <div class="seat-badge-label">Tu asiento elegido</div>
+          <div class="seat-badge-value" id="seatBadgeValue">—</div>
+          <span class="seat-badge-change" onclick="document.getElementById('reservar').scrollIntoView({behavior:'smooth'})">Cambiar asiento</span>
+        </div>
+      </div>
+
+      <div class="price-old">Valor real: S/ 150</div>
+      <div class="price-new">S/ 50</div>
+      <div class="price-badge">— 67% de descuento —</div>
+      <div class="form-fields">
+        <input type="text" id="resName" class="field-input" placeholder="Tu nombre completo">
+        <select id="resRubro" class="field-input">
+          <option value="" disabled selected>¿Para qué quieres crear contenido?</option>
+          <option value="Mi negocio">Mi negocio</option>
+          <option value="Mi marca personal">Mi marca personal</option>
+          <option value="Aún no lo sé">Aún no lo sé</option>
+        </select>
+      </div>
+
+      <!-- MÉTODO DE PAGO -->
+      <div class="pay-select-label">¿Cómo prefieres pagar?</div>
+      <div class="pay-select-group" id="paySelectGroup">
+        <button type="button" class="pay-option" data-pay="Efectivo">💵 Efectivo</button>
+        <button type="button" class="pay-option" data-pay="Yape">📲 Yape</button>
+      </div>
+
+      <a href="#" id="reserveBtn2" class="btn">Reservar por WhatsApp →</a>
+      <div class="form-hint">Se abrirá WhatsApp con tu reserva lista — solo confirma el envío</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Taller presencial · 2 horas · S/ 50 · Ayacucho</div>
+</footer>
+
+<script>
+  /* ── MÓDULOS EXPANDIBLES ── */
+  function toggleModule(el){
+    const isOpen = el.classList.contains('open');
+    document.querySelectorAll('.module.open').forEach(m => m.classList.remove('open'));
+    if(!isOpen) el.classList.add('open');
+  }
+  // Abre el primero por defecto al cargar
+  window.addEventListener('DOMContentLoaded', () => {
+    const first = document.querySelector('.module');
+    if(first) first.classList.add('open');
+  });
+
+  /* ── PARTICLES CANVAS ── */
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function rand(a,b){return a + Math.random()*(b-a);}
+
+  class Particle{
+    constructor(){this.reset();}
+    reset(){
+      this.x = rand(0, W);
+      this.y = rand(0, H);
+      this.r = rand(0.5, 2.2);
+      this.alpha = rand(0.1, 0.6);
+      this.speed = rand(0.1, 0.45);
+      this.drift = rand(-0.15, 0.15);
+      this.color = Math.random() < 0.6 ? '255,45,120' : Math.random() < 0.5 ? '140,80,255' : '255,209,102';
+    }
+    update(){
+      this.y -= this.speed;
+      this.x += this.drift;
+      this.alpha -= 0.0008;
+      if(this.alpha <= 0 || this.y < -10) this.reset();
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${this.color},${this.alpha})`;
+      ctx.fill();
+    }
+  }
+
+  for(let i=0; i<80; i++) particles.push(new Particle());
+
+  // also add bigger glow orbs
+  class Orb{
+    constructor(){this.reset();}
+    reset(){
+      this.x = rand(0, W);
+      this.y = rand(H*0.3, H);
+      this.r = rand(60, 160);
+      this.alpha = rand(0.015, 0.045);
+      this.speed = rand(0.05, 0.15);
+    }
+    update(){
+      this.y -= this.speed;
+      if(this.y + this.r < 0) this.reset();
+    }
+    draw(){
+      const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r);
+      g.addColorStop(0, `rgba(255,45,120,${this.alpha})`);
+      g.addColorStop(1, 'rgba(255,45,120,0)');
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+      ctx.fillStyle = g;
+      ctx.fill();
+    }
+  }
+  const orbs = Array.from({length:5}, () => new Orb());
+
+  function animate(){
+    ctx.clearRect(0,0,W,H);
+    orbs.forEach(o => {o.update(); o.draw();});
+    particles.forEach(p => {p.update(); p.draw();});
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  /* ── ANIMATED COUNTER ── */
+  const TARGET = 1000000;
+  const counterEl = document.getElementById('counterNum');
+  let started = false;
+  function startCounter(){
+    if(started) return; started = true;
+    const dur = 2200;
+    const start = performance.now();
+    function step(now){
+      const t = Math.min((now - start)/dur, 1);
+      const ease = 1 - Math.pow(1-t, 3);
+      const val = Math.round(TARGET * ease);
+      counterEl.textContent = val >= 1000000
+        ? '+1M' : val >= 1000 ? Math.round(val/1000)+'K' : val;
+      if(t < 1) requestAnimationFrame(step);
+      else counterEl.textContent = '+1M';
+    }
+    requestAnimationFrame(step);
+  }
+  // start when hero is visible
+  const heroObs = new IntersectionObserver(entries => {
+    if(entries[0].isIntersecting){ startCounter(); heroObs.disconnect(); }
+  }, {threshold: 0.3});
+  heroObs.observe(document.querySelector('.hero'));
+
+  /* ══════════════════════════════════════════════════
+     FIREBASE CONFIG — reemplaza con tus credenciales
+     ══════════════════════════════════════════════════
+     Cómo obtenerlas:
+     1. Ve a https://console.firebase.google.com
+     2. Crea proyecto → nombre: "taller-viral"
+     3. Build → Realtime Database → Crear base de datos
+        (elige "Iniciar en modo de prueba" → 30 días gratis)
+     4. En ⚙️ Configuración del proyecto → Tus apps → </> Web
+     5. Registra app y copia el objeto firebaseConfig aquí abajo
+     ════════════════════════════════════════════════ */
+  const FIREBASE_CONFIG = {
+    apiKey:            "AIzaSyCT7YBozgzJnqqS6rUBptqLostUKV2t6g8",
+    authDomain:        "taller-viral-1f16c.firebaseapp.com",
+    databaseURL:       "https://taller-viral-1f16c-default-rtdb.firebaseio.com",
+    projectId:         "taller-viral-1f16c",
+    storageBucket:     "taller-viral-1f16c.firebasestorage.app",
+    messagingSenderId: "866940748045",
+    appId:             "1:866940748045:web:bf3c6fc0c9f5c0a544f044"
+  };
+
+  /* ── SEAT GRID ── */
+  const TOTAL_SEATS   = 49;
+  const VISIBLE_INITIAL = 49;
+  const WHATSAPP_NUMBER = "51931279994";
+  const DB_PATH = "asientos"; // nodo en Firebase
+
+  let takenSet = new Set();   // asientos ocupados (índices)
+  let selected  = null;
+  let dbRef     = null;       // referencia Firebase
+
+  const grid       = document.getElementById('seatGrid');
+  const status     = document.getElementById('seatStatus');
+  const fill       = document.getElementById('progressFill');
+
+  /* ── Actualiza barra de progreso y contador ── */
+  function refreshProgress(){
+    const taken = takenSet.size;
+    const free  = TOTAL_SEATS - taken;
+    const pct   = (taken / TOTAL_SEATS) * 100;
+    fill.style.width = Math.max(pct, 2) + '%';
+    document.getElementById('cuposNum').textContent = free;
+  }
+
+  /* ── Marca un asiento visualmente ── */
+  function markSeatTaken(i){
+    const el = grid.querySelector(`[data-index="${i}"]`);
+    if(!el) return;
+    el.classList.add('taken');
+    el.classList.remove('selected');
+    if(selected === i){ selected = null; clearStatus(); }
+  }
+
+  /* ── Libera un asiento visualmente (cuando se borra desde el panel admin) ── */
+  function markSeatFree(i){
+    const el = grid.querySelector(`[data-index="${i}"]`);
+    if(!el) return;
+    el.classList.remove('taken');
+  }
+
+  /* ── Construye o actualiza asiento ── */
+  function renderSeat(i){
+    if(grid.querySelector(`[data-index="${i}"]`)) return null;
+    const seat = document.createElement('div');
+    seat.className = 'seat';
+    seat.dataset.index = i;
+    seat.style.animationDelay = (i % VISIBLE_INITIAL) * 12 + 'ms';
+    if(takenSet.has(i)) seat.classList.add('taken');
+
+    seat.addEventListener('click', () => {
+      if(seat.classList.contains('taken')) return;
+      // TOGGLE: mismo asiento → deseleccionar
+      if(selected === i){
+        seat.classList.remove('selected');
+        selected = null;
+        clearStatus();
+        return;
+      }
+      // Deseleccionar anterior
+      if(selected !== null){
+        const prev = grid.querySelector(`[data-index="${selected}"]`);
+        if(prev) prev.classList.remove('selected');
+      }
+      seat.classList.add('selected');
+      selected = i;
+      updateStatus();
+    });
+    return seat;
+  }
+
+  function buildGrid(count){
+    for(let i = 0; i < count; i++){
+      const s = renderSeat(i);
+      if(s) grid.appendChild(s);
+    }
+  }
+
+  buildGrid(VISIBLE_INITIAL);
+  setTimeout(refreshProgress, 300);
+
+  /* ── Estado vacío ── */
+  function clearStatus(){
+    status.innerHTML = 'Selecciona un asiento para continuar';
+    document.getElementById('investLock').classList.remove('hidden');
+    document.getElementById('seatBadge').classList.remove('visible');
+  }
+
+  /* ── Asiento elegido ── */
+  function updateStatus(){
+    const fila   = Math.floor(selected / 7) + 1;
+    const numero = (selected % 7) + 1;
+    status.innerHTML = `Asiento seleccionado: <b>Fila ${fila}, N°${numero}</b>`;
+
+    document.getElementById('investLock').classList.add('hidden');
+    const badge = document.getElementById('seatBadge');
+    document.getElementById('seatBadgeValue').textContent = `Fila ${fila}  ·  Asiento N°${numero}`;
+    badge.classList.add('visible');
+
+    // Baja automáticamente a Inversión un instante después de elegir
+    setTimeout(() => {
+      document.querySelector('.section-invest').scrollIntoView({behavior:'smooth', block:'start'});
+    }, 500);
+  }
+
+  /* ══════════════════════════════════════════════════
+     FIREBASE — inicializa y escucha cambios en tiempo real
+     ════════════════════════════════════════════════ */
+  function initFirebase(){
+    try {
+      // Importa Firebase desde CDN (módulo ES)
+      Promise.all([
+        import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),
+        import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js')
+      ]).then(([{initializeApp}, {getDatabase, ref, onValue, set}]) => {
+        const app = initializeApp(FIREBASE_CONFIG);
+        const db  = getDatabase(app);
+        dbRef     = ref(db, DB_PATH);
+
+        // Escucha en tiempo real — cualquier cambio en la DB actualiza el mapa
+        onValue(dbRef, (snapshot) => {
+          const data = snapshot.val() || {};
+          const nuevos = Object.keys(data).map(Number);
+          const nuevosSet = new Set(nuevos);
+
+          // Agrega y marca visualmente los recién ocupados
+          nuevos.forEach(i => {
+            if(!takenSet.has(i)){
+              takenSet.add(i);
+              markSeatTaken(i);
+            }
+          });
+
+          // Libera visualmente los que ya no están en la DB (liberados desde el panel admin)
+          takenSet.forEach(i => {
+            if(!nuevosSet.has(i)){
+              takenSet.delete(i);
+              markSeatFree(i);
+            }
+          });
+
+          refreshProgress();
+        });
+
+        // Guarda referencias para usarlas al reservar
+        window._fbSet = (idx, data) => {
+          const node = ref(db, `${DB_PATH}/${idx}`);
+          return set(node, data || true);
+        };
+        window._fbRemove = (idx) => {
+          const node = ref(db, `${DB_PATH}/${idx}`);
+          return set(node, null);
+        };
+
+      }).catch(err => {
+        console.warn('Firebase no cargó, modo offline:', err);
+        window._fbSet = () => Promise.resolve(); // fallback silencioso
+      });
+    } catch(e){
+      console.warn('Firebase error:', e);
+      window._fbSet = () => Promise.resolve();
+    }
+  }
+
+  initFirebase();
+
+  /* ── CERTIFICADO — flip al click ── */
+  document.getElementById('certCard').addEventListener('click', function(){
+    this.classList.toggle('flipped');
+  });
+
+  /* ── SELECTOR DE MÉTODO DE PAGO ── */
+  let selectedPayMethod = null;
+  document.querySelectorAll('.pay-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pay-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedPayMethod = btn.dataset.pay;
+    });
+  });
+
+  /* ── FORM → WHATSAPP + guardar en Firebase ── */
+  document.getElementById('reserveBtn2').addEventListener('click', e => {
+    e.preventDefault();
+    const name  = document.getElementById('resName').value.trim();
+    const rubro = document.getElementById('resRubro').value.trim();
+    if(!name || !rubro){ alert('Por favor completa tu nombre y selecciona una opción.'); return; }
+    if(!selectedPayMethod){ alert('Por favor elige tu método de pago (Efectivo o Yape).'); return; }
+
+    let seatInfo = '';
+    if(selected !== null){
+      const fila   = Math.floor(selected / 7) + 1;
+      const numero = (selected % 7) + 1;
+      seatInfo = `\n💺 Asiento: Fila ${fila}, N°${numero}`;
+
+      const seatIdx = selected;
+
+      // Guarda en Firebase (visible para todos en tiempo real)
+      if(window._fbSet){
+        const reservaData = {
+          nombre: name,
+          rubro: rubro,
+          pago: selectedPayMethod,
+          fecha: new Date().toISOString(),
+          fila: fila,
+          numero: numero
+        };
+        window._fbSet(seatIdx, reservaData).catch(err => console.warn('No se pudo guardar en Firebase:', err));
+      }
+
+      // Marca localmente de inmediato (no espera respuesta)
+      takenSet.add(seatIdx);
+      markSeatTaken(seatIdx);
+      selected = null;
+      refreshProgress();
+      clearStatus();
+    }
+
+    const msg = encodeURIComponent(`¡Hola! 🔥 Vi el taller "Cómo Crear Contenido Viral" y quiero asegurar mi cupo antes de que se llene.\n\n👤 Nombre: ${name}${seatInfo}\n🎯 Quiero crear contenido para: ${rubro}\n💳 Método de pago: ${selectedPayMethod}\n\n¿Me confirmas mi lugar? 🙌`);
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
+    document.querySelectorAll('.pay-option').forEach(b => b.classList.remove('selected'));
+    selectedPayMethod = null;
+  });
+
+  /* ── TIKTOK EMBEDS ── */
+  document.querySelectorAll('.video-frame').forEach(frame => {
+    frame.addEventListener('click', () => {
+      if(frame.classList.contains('loaded')) return;
+      const cite = frame.dataset.cite, id = frame.dataset.id;
+      frame.classList.add('loaded');
+      frame.innerHTML = `<blockquote class="tiktok-embed" cite="${cite}" data-video-id="${id}" style="margin:0;"><section></section></blockquote>`;
+      const script = document.createElement('script');
+      script.src = 'https://www.tiktok.com/embed.js?'+Date.now();
+      document.body.appendChild(script);
+    }, {once:true});
+  });
+
+  /* ── VER MÁS RESULTADOS ── */
+  function toggleMasResultados(btn){
+    const extra = document.getElementById('videoGridExtra');
+    const links = document.getElementById('resultLinksExtra');
+    const showing = extra.classList.toggle('show');
+    links.classList.toggle('show', showing);
+    btn.textContent = showing ? 'Ver menos resultados ↑' : 'Ver más resultados ↓';
+    if(showing){
+      extra.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  }
+
+  /* ── SCROLL REVEAL ── */
+  const revealEls = document.querySelectorAll('section');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){ entry.target.classList.add('in-view'); obs.unobserve(entry.target); }
+    });
+  }, {threshold:0.12});
+  revealEls.forEach(el => { el.classList.add('reveal'); obs.observe(el); });
+</script>
+</body>
+</html>
