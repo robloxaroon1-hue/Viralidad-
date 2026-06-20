@@ -1674,8 +1674,12 @@
             }
           });
 
-          // Libera visualmente los que ya no están en la DB (liberados desde el panel admin)
-          takenSet.forEach(i => {
+          // Libera visualmente los que ya no están en la DB (liberados desde el panel admin).
+          // OJO: iteramos sobre una COPIA (Array.from) y no sobre takenSet directo,
+          // porque borrar elementos de un Set mientras se itera con forEach sobre
+          // el propio Set puede saltarse índices — eso causaba que algunos asientos
+          // liberados desde admin no se "restablecieran" visualmente en la página pública.
+          Array.from(takenSet).forEach(i => {
             if(!nuevosSet.has(i)){
               takenSet.delete(i);
               markSeatFree(i);
