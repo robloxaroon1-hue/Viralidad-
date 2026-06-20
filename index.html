@@ -210,6 +210,11 @@
   @keyframes shimmer{to{left:160%;}}
   .btn:hover{transform:translateY(-2px); box-shadow:0 12px 40px rgba(255,45,120,0.55), 0 0 0 1px rgba(255,45,120,0.4) inset;}
   .btn:active{transform:translateY(0);}
+  .btn.btn-disabled{
+    opacity:0.6; cursor:wait; pointer-events:none;
+    transform:none !important; animation:none;
+  }
+  .btn.btn-disabled::before{display:none;}
 
   /* CUPOS PROGRESS */
   .cupos-wrap{margin-top:20px;}
@@ -653,6 +658,19 @@
   .video-frame.loaded{cursor:default; background:transparent; border:none;}
   .video-frame.loaded .play-btn, .video-frame.loaded .frame-label{display:none;}
   .video-grid blockquote{border-radius:14px; overflow:hidden; width:100%; max-width:100%;}
+
+  /* Forzamos que el embed real de TikTok (iframe inyectado por su script)
+     respete el tamaño del contenedor en vez de imponer su propio ancho/alto
+     fijo — sin esto, en móvil el video se desborda sobre la tarjeta vecina. */
+  .video-frame.loaded{aspect-ratio:9/16; height:auto;}
+  .video-frame.loaded blockquote.tiktok-embed,
+  .video-frame.loaded blockquote.tiktok-embed section,
+  .video-frame.loaded iframe{
+    position:absolute; inset:0;
+    width:100% !important; height:100% !important;
+    max-width:100% !important; min-width:0 !important;
+    margin:0 !important;
+  }
   @media (max-width:480px){.video-grid{grid-template-columns:1fr 1fr;}}
 
   /* SCAN LINE OVERLAY — subtle CRT vibe */
@@ -837,7 +855,7 @@
       <div class="logistics-item"><b>2 horas</b><span>Duración</span></div>
     </div>
 
-    <a href="#reservar" class="btn">Reservar mi cupo — S/ 50</a>
+    <a href="#reservar" class="btn">Quiero mi cupo antes que se llene →</a>
     <div class="cupos-wrap">
       <div class="cupos">Quedan <b id="cuposNum">49</b> de 49 cupos disponibles</div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -1504,6 +1522,16 @@
   let selected  = null;
   let dbRef     = null;       // referencia Firebase
 
+  // Promesa que se resuelve cuando Firebase termina de inicializar
+  // (o se rechaza si falla). Cualquier función que necesite escribir
+  // espera esto en vez de fallar silenciosamente si el usuario hace
+  // clic antes de que el módulo de Firebase termine de cargar.
+  let firebaseReadyResolve, firebaseReadyReject;
+  const firebaseReady = new Promise((res, rej) => {
+    firebaseReadyResolve = res;
+    firebaseReadyReject  = rej;
+  });
+
   const grid       = document.getElementById('seatGrid');
   const status     = document.getElementById('seatStatus');
   const fill       = document.getElementById('progressFill');
@@ -1600,6 +1628,8 @@
   /* ══════════════════════════════════════════════════
      FIREBASE — inicializa y escucha cambios en tiempo real
      ════════════════════════════════════════════════ */
+  let _setFn = null, _removeFn = null;
+
   function initFirebase(){
     try {
       // Importa Firebase desde CDN (módulo ES)
@@ -1637,26 +1667,33 @@
         });
 
         // Guarda referencias para usarlas al reservar
-        window._fbSet = (idx, data) => {
-          const node = ref(db, `${DB_PATH}/${idx}`);
-          return set(node, data || true);
-        };
-        window._fbRemove = (idx) => {
-          const node = ref(db, `${DB_PATH}/${idx}`);
-          return set(node, null);
-        };
+        _setFn = (idx, data) => set(ref(db, `${DB_PATH}/${idx}`), data || true);
+        _removeFn = (idx) => set(ref(db, `${DB_PATH}/${idx}`), null);
+
+        firebaseReadyResolve();
 
       }).catch(err => {
         console.warn('Firebase no cargó, modo offline:', err);
-        window._fbSet = () => Promise.resolve(); // fallback silencioso
+        firebaseReadyReject(err);
       });
     } catch(e){
       console.warn('Firebase error:', e);
-      window._fbSet = () => Promise.resolve();
+      firebaseReadyReject(e);
     }
   }
 
   initFirebase();
+
+  // window._fbSet espera a que Firebase esté listo antes de escribir.
+  // Si el usuario confirma su reserva justo cuando la página recién
+  // cargó (antes de que el módulo de Firebase termine de conectar),
+  // esto evita que la escritura se pierda en silencio.
+  window._fbSet = (idx, data) => {
+    return firebaseReady.then(() => _setFn(idx, data));
+  };
+  window._fbRemove = (idx) => {
+    return firebaseReady.then(() => _removeFn(idx));
+  };
 
   /* ── CERTIFICADO — flip al click ── */
   document.getElementById('certCard').addEventListener('click', function(){
@@ -1673,13 +1710,43 @@
     });
   });
 
+  /* ── ABRIR WHATSAPP con intento + respaldo automático ──
+     Los navegadores no informan si una app "no abrió", así que
+     usamos una señal indirecta: si la pestaña/ventana sigue visible
+     después de un par de segundos, asumimos que el primer esquema
+     no tenía una app asociada y probamos el segundo automáticamente. */
+  function openWhatsAppConRespaldo(numero, mensaje){
+    const msg = encodeURIComponent(mensaje);
+    const urlPrimaria   = `https://wa.me/${numero}?text=${msg}`;
+    const urlRespaldo   = `https://api.whatsapp.com/send?phone=${numero}&text=${msg}`;
+
+    let yaSeFue = false;
+    const onHide = () => { yaSeFue = true; };
+    document.addEventListener('visibilitychange', onHide, {once:true});
+    window.addEventListener('blur', onHide, {once:true});
+
+    window.open(urlPrimaria, '_blank');
+
+    setTimeout(() => {
+      document.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('blur', onHide);
+      if(!yaSeFue){
+        // El primer intento no parece haber abierto ninguna app — probamos el respaldo
+        window.open(urlRespaldo, '_blank');
+      }
+    }, 1200);
+  }
+
   /* ── FORM → WHATSAPP + guardar en Firebase ── */
-  document.getElementById('reserveBtn2').addEventListener('click', e => {
+  document.getElementById('reserveBtn2').addEventListener('click', async e => {
     e.preventDefault();
     const name  = document.getElementById('resName').value.trim();
     const rubro = document.getElementById('resRubro').value.trim();
     if(!name || !rubro){ alert('Por favor completa tu nombre y selecciona una opción.'); return; }
     if(!selectedPayMethod){ alert('Por favor elige tu método de pago (Efectivo o Yape).'); return; }
+
+    const btn = document.getElementById('reserveBtn2');
+    const btnTextoOriginal = btn.textContent;
 
     let seatInfo = '';
     if(selected !== null){
@@ -1688,21 +1755,33 @@
       seatInfo = `\n💺 Asiento: Fila ${fila}, N°${numero}`;
 
       const seatIdx = selected;
+      const reservaData = {
+        nombre: name,
+        rubro: rubro,
+        pago: selectedPayMethod,
+        fecha: new Date().toISOString(),
+        fila: fila,
+        numero: numero
+      };
 
-      // Guarda en Firebase (visible para todos en tiempo real)
-      if(window._fbSet){
-        const reservaData = {
-          nombre: name,
-          rubro: rubro,
-          pago: selectedPayMethod,
-          fecha: new Date().toISOString(),
-          fila: fila,
-          numero: numero
-        };
-        window._fbSet(seatIdx, reservaData).catch(err => console.warn('No se pudo guardar en Firebase:', err));
+      // Guarda en Firebase ANTES de marcar nada localmente — si falla,
+      // el usuario se entera y el asiento no queda "falsamente reservado"
+      // solo en su pantalla.
+      btn.classList.add('btn-disabled');
+      btn.textContent = 'Guardando tu reserva…';
+      try {
+        await window._fbSet(seatIdx, reservaData);
+      } catch(err){
+        console.warn('No se pudo guardar en Firebase:', err);
+        btn.classList.remove('btn-disabled');
+        btn.textContent = btnTextoOriginal;
+        alert('No se pudo guardar tu reserva (puede que alguien más haya tomado ese asiento justo ahora, o tu conexión falló). Por favor elige tu asiento de nuevo e inténtalo otra vez.');
+        return;
       }
+      btn.classList.remove('btn-disabled');
+      btn.textContent = btnTextoOriginal;
 
-      // Marca localmente de inmediato (no espera respuesta)
+      // Recién ahora que SÍ se guardó en Firebase, marcamos localmente
       takenSet.add(seatIdx);
       markSeatTaken(seatIdx);
       selected = null;
@@ -1710,8 +1789,8 @@
       clearStatus();
     }
 
-    const msg = encodeURIComponent(`¡Hola! 🔥 Vi el taller "Cómo Crear Contenido Viral" y quiero asegurar mi cupo antes de que se llene.\n\n👤 Nombre: ${name}${seatInfo}\n🎯 Quiero crear contenido para: ${rubro}\n💳 Método de pago: ${selectedPayMethod}\n\n¿Me confirmas mi lugar? 🙌`);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
+    const msg = `¡Hola! 🔥 Vi el taller "Creación de Contenido Viral" y quiero asegurar mi cupo antes de que se llene.\n\n👤 Nombre: ${name}${seatInfo}\n🎯 Quiero crear contenido para: ${rubro}\n💳 Método de pago: ${selectedPayMethod}\n\n¿Me confirmas mi lugar? 🙌`;
+    openWhatsAppConRespaldo(WHATSAPP_NUMBER, msg);
     document.querySelectorAll('.pay-option').forEach(b => b.classList.remove('selected'));
     selectedPayMethod = null;
   });
