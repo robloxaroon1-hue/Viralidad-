@@ -661,17 +661,27 @@
 
   /* Forzamos que el embed real de TikTok (iframe inyectado por su script)
      respete el tamaño del contenedor en vez de imponer su propio ancho/alto
-     fijo — sin esto, en móvil el video se desborda sobre la tarjeta vecina. */
+     fijo. El iframe de TikTok trae un ancho mínimo interno (~325px) que NO
+     se puede anular solo con width:100%, porque ese mínimo vive dentro del
+     propio iframe (no podemos tocarlo por política de same-origin). En 2
+     columnas, cada celda en móvil mide menos que ese mínimo, así que el
+     video se desborda. La solución: dejamos que el embed nazca a su ancho
+     base (325px) y lo escalamos hacia abajo con transform hasta que quepa
+     en el contenedor, recortando el sobrante con overflow:hidden. */
   .video-frame.loaded{aspect-ratio:9/16; height:auto;}
-  .video-frame.loaded blockquote.tiktok-embed,
+  .video-frame.loaded blockquote.tiktok-embed{
+    position:absolute; top:0; left:0;
+    width:325px; max-width:none; margin:0 !important;
+    transform-origin: top left;
+    /* El ancho real de la celda se mide en JS y se usa para fijar
+       --tt-scale (325px * escala = ancho de la celda) */
+    transform: scale(var(--tt-scale, 1));
+  }
   .video-frame.loaded blockquote.tiktok-embed section,
   .video-frame.loaded iframe{
-    position:absolute; inset:0;
-    width:100% !important; height:100% !important;
-    max-width:100% !important; min-width:0 !important;
-    margin:0 !important;
+    width:325px !important; min-width:0 !important; margin:0 !important;
   }
-  @media (max-width:480px){.video-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:480px){.video-grid{grid-template-columns:1fr; max-width:280px; margin-left:auto; margin-right:auto;}}
 
   /* SCAN LINE OVERLAY — subtle CRT vibe */
   .scanlines{
@@ -1627,8 +1637,17 @@
 
   /* ══════════════════════════════════════════════════
      FIREBASE — inicializa y escucha cambios en tiempo real
+
+     IMPORTANTE: esta página es pública, así que NO lee el nodo
+     "asientos" (que tiene nombre/rubro/pago — datos privados que
+     solo debe ver el panel admin con login). En su lugar lee
+     "asientos_ocupados", un nodo espejo que solo guarda true/false
+     por índice, sin ningún dato personal. Al reservar, escribe en
+     los DOS nodos: los datos completos en "asientos" y el flag
+     público en "asientos_ocupados".
      ════════════════════════════════════════════════ */
   let _setFn = null, _removeFn = null;
+  const PUBLIC_DB_PATH = "asientos_ocupados";
 
   function initFirebase(){
     try {
@@ -1639,7 +1658,7 @@
       ]).then(([{initializeApp}, {getDatabase, ref, onValue, set}]) => {
         const app = initializeApp(FIREBASE_CONFIG);
         const db  = getDatabase(app);
-        dbRef     = ref(db, DB_PATH);
+        dbRef     = ref(db, PUBLIC_DB_PATH);
 
         // Escucha en tiempo real — cualquier cambio en la DB actualiza el mapa
         onValue(dbRef, (snapshot) => {
@@ -1664,11 +1683,22 @@
           });
 
           refreshProgress();
+        }, (err) => {
+          // Si la lectura falla (p.ej. reglas mal puestas) lo dejamos
+          // visible en consola en vez de fallar en silencio como antes.
+          console.warn('Error leyendo asientos_ocupados:', err);
         });
 
-        // Guarda referencias para usarlas al reservar
-        _setFn = (idx, data) => set(ref(db, `${DB_PATH}/${idx}`), data || true);
-        _removeFn = (idx) => set(ref(db, `${DB_PATH}/${idx}`), null);
+        // Guarda referencias para usarlas al reservar.
+        // _setFn escribe en AMBOS nodos: datos completos (privados) + flag público.
+        _setFn = (idx, data) => Promise.all([
+          set(ref(db, `${DB_PATH}/${idx}`), data || true),
+          set(ref(db, `${PUBLIC_DB_PATH}/${idx}`), true)
+        ]);
+        _removeFn = (idx) => Promise.all([
+          set(ref(db, `${DB_PATH}/${idx}`), null),
+          set(ref(db, `${PUBLIC_DB_PATH}/${idx}`), null)
+        ]);
 
         firebaseReadyResolve();
 
@@ -1714,25 +1744,37 @@
      Los navegadores no informan si una app "no abrió", así que
      usamos una señal indirecta: si la pestaña/ventana sigue visible
      después de un par de segundos, asumimos que el primer esquema
-     no tenía una app asociada y probamos el segundo automáticamente. */
-  function openWhatsAppConRespaldo(numero, mensaje){
+     no tenía una app asociada y probamos el segundo automáticamente.
+
+     IMPORTANTE: recibe una ventana YA ABIERTA (creada de forma síncrona
+     en el momento del clic) y solo le asigna la URL. Abrir una ventana
+     nueva en este punto (después de un await) sería bloqueado por el
+     navegador como pop-up. */
+  function openWhatsAppConRespaldo(ventana, numero, mensaje){
     const msg = encodeURIComponent(mensaje);
     const urlPrimaria   = `https://wa.me/${numero}?text=${msg}`;
     const urlRespaldo   = `https://api.whatsapp.com/send?phone=${numero}&text=${msg}`;
+
+    if(!ventana || ventana.closed){
+      // El usuario cerró la pestaña antes de tiempo, o el navegador la
+      // bloqueó igual. Como último recurso, navegamos en la misma página.
+      window.location.href = urlPrimaria;
+      return;
+    }
 
     let yaSeFue = false;
     const onHide = () => { yaSeFue = true; };
     document.addEventListener('visibilitychange', onHide, {once:true});
     window.addEventListener('blur', onHide, {once:true});
 
-    window.open(urlPrimaria, '_blank');
+    ventana.location.href = urlPrimaria;
 
     setTimeout(() => {
       document.removeEventListener('visibilitychange', onHide);
       window.removeEventListener('blur', onHide);
-      if(!yaSeFue){
+      if(!yaSeFue && !ventana.closed){
         // El primer intento no parece haber abierto ninguna app — probamos el respaldo
-        window.open(urlRespaldo, '_blank');
+        ventana.location.href = urlRespaldo;
       }
     }, 1200);
   }
@@ -1747,6 +1789,14 @@
 
     const btn = document.getElementById('reserveBtn2');
     const btnTextoOriginal = btn.textContent;
+
+    // Abrimos la pestaña de WhatsApp AHORA MISMO, de forma síncrona dentro
+    // del clic. Si esperamos al await de Firebase para hacer window.open,
+    // el navegador ya no lo reconoce como originado por el usuario y lo
+    // bloquea en silencio (por eso "no pasaba nada" al hacer clic). Le
+    // asignamos la URL real más abajo, una vez armado el mensaje — eso sí
+    // está permitido porque la ventana ya existe.
+    const ventanaWA = window.open('about:blank', '_blank');
 
     let seatInfo = '';
     if(selected !== null){
@@ -1775,6 +1825,7 @@
         console.warn('No se pudo guardar en Firebase:', err);
         btn.classList.remove('btn-disabled');
         btn.textContent = btnTextoOriginal;
+        if(ventanaWA && !ventanaWA.closed) ventanaWA.close();
         alert('No se pudo guardar tu reserva (puede que alguien más haya tomado ese asiento justo ahora, o tu conexión falló). Por favor elige tu asiento de nuevo e inténtalo otra vez.');
         return;
       }
@@ -1790,22 +1841,43 @@
     }
 
     const msg = `¡Hola! 🔥 Vi el taller "Creación de Contenido Viral" y quiero asegurar mi cupo antes de que se llene.\n\n👤 Nombre: ${name}${seatInfo}\n🎯 Quiero crear contenido para: ${rubro}\n💳 Método de pago: ${selectedPayMethod}\n\n¿Me confirmas mi lugar? 🙌`;
-    openWhatsAppConRespaldo(WHATSAPP_NUMBER, msg);
+    openWhatsAppConRespaldo(ventanaWA, WHATSAPP_NUMBER, msg);
     document.querySelectorAll('.pay-option').forEach(b => b.classList.remove('selected'));
     selectedPayMethod = null;
   });
 
   /* ── TIKTOK EMBEDS ── */
+  // Ancho base que TikTok usa internamente para su embed (no se puede
+  // forzar más angosto desde fuera del iframe). Escalamos hacia abajo
+  // proporcionalmente para que quepa en celdas angostas (2 columnas, móvil).
+  const TT_BASE_WIDTH = 325;
+
+  function ajustarEscalaTikTok(frame){
+    const escala = frame.clientWidth / TT_BASE_WIDTH;
+    frame.style.setProperty('--tt-scale', escala);
+  }
+
   document.querySelectorAll('.video-frame').forEach(frame => {
     frame.addEventListener('click', () => {
       if(frame.classList.contains('loaded')) return;
       const cite = frame.dataset.cite, id = frame.dataset.id;
       frame.classList.add('loaded');
+      ajustarEscalaTikTok(frame);
       frame.innerHTML = `<blockquote class="tiktok-embed" cite="${cite}" data-video-id="${id}" style="margin:0;"><section></section></blockquote>`;
       const script = document.createElement('script');
       script.src = 'https://www.tiktok.com/embed.js?'+Date.now();
       document.body.appendChild(script);
     }, {once:true});
+  });
+
+  // Si la ventana cambia de tamaño (rotar el celular, redimensionar), recalculamos
+  // la escala de todos los embeds ya cargados para que sigan bien contenidos.
+  let ttResizeTimeout = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(ttResizeTimeout);
+    ttResizeTimeout = setTimeout(() => {
+      document.querySelectorAll('.video-frame.loaded').forEach(ajustarEscalaTikTok);
+    }, 150);
   });
 
   /* ── VER MÁS RESULTADOS ── */

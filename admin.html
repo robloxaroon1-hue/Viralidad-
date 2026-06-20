@@ -223,6 +223,10 @@
   };
 
   const DB_PATH = "asientos";
+  // Nodo espejo público (solo true/false por asiento, sin datos personales)
+  // que lee la página pública index.html. Hay que mantenerlo sincronizado:
+  // al liberar un asiento aquí, también se borra su flag en este nodo.
+  const PUBLIC_DB_PATH = "asientos_ocupados";
 
   let allReservas = {}; // { idx: {nombre, rubro, pago, fecha, fila, numero} }
   let dbInstance = null;
@@ -288,7 +292,10 @@
     authInstance = { signOut: () => signOut(auth) };
 
     signInFn = (email, pass) => signInWithEmailAndPassword(auth, email, pass);
-    removeFn = (idx) => set(ref(dbInstance, `${DB_PATH}/${idx}`), null);
+    removeFn = (idx) => Promise.all([
+      set(ref(dbInstance, `${DB_PATH}/${idx}`), null),
+      set(ref(dbInstance, `${PUBLIC_DB_PATH}/${idx}`), null)
+    ]);
 
     // Reacciona a sesión iniciada / cerrada
     onAuthStateChanged(auth, (user) => {
